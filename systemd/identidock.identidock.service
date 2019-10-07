@@ -1,0 +1,22 @@
+[Unit]
+    Description=identidock Cintainer for Identidock
+    After=docker.service
+    Requires=docker.service
+    After=identidock.redis.service
+    Requires=identidock.redis.service
+    After=identidock.dnmonster.service
+    Requires=identidock.dnmonster.service
+[Service]
+    TimeStartSec=0
+    Restart=always
+    ExecStartPre=- docker stop identidock
+    ExecStartPre=- docker rm identidock
+    ExecStartPre= docker pull amouat/identidock
+    ExecStart=docker run --name identidock \
+              --link dnmonster:dnmonster \
+              --link redis:redis \
+              -e ENV=PROD \
+              amouat/identidock
+[Install]
+    Wantedby=multi-ser.target
+

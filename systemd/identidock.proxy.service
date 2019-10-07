@@ -1,0 +1,19 @@
+[Unit]
+    Description=Proxy Container for Identidock
+    After=docker.service
+    Requires=docker.service
+    Requires=identidock.identidock.service
+
+[Service]
+    TimeoutStartSec=0
+    Restart=always
+    ExecStartPre=- docker stop proxy
+    ExecStartPre=- docker rm proxy
+    ExecStartPre=docker run --name proxy \
+                 --link identidock:identidock \
+                 -p 80:80 \
+                 -e NGINX_HOST=localhost \
+                 -e NGINX_PROXY=http://identidock:9090 \
+                 proxy
+[Install]
+    WantedBy=multi-user.target
